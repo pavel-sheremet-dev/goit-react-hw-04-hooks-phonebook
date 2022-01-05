@@ -1,5 +1,5 @@
 import { GlobalStyle } from "./styles/GlobalStyles";
-import React, { Component } from "react";
+import { useState, useEffect } from "react";
 import { ThemeProvider } from "styled-components";
 import themes from "./styles/themes/index";
 import ThemeSwitcher from "./components/themeSwitcher/ThemeSwitcher";
@@ -14,131 +14,111 @@ import Logo from "./components/logo/Logo";
 import Container from "./components/container/Container";
 import toast, { Toaster } from "react-hot-toast";
 
-// { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-// { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-// { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-// { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
+const App = () => {
+  const [themeTitle, setThemeTitle] = useState(
+    () => localStorage.getItem("theme") ?? "dark"
+  );
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem("local-contacts")) ?? []
+  );
+  const [filter, setFilter] = useState("");
 
-export default class App extends Component {
-  state = {
-    themeTitle: localStorage.getItem("theme") || "dark",
-    contacts: JSON.parse(localStorage.getItem("local-contacts")) || [],
-    filter: "",
-  };
+  useEffect(() => {
+    localStorage.setItem("theme", themeTitle);
+  }, [themeTitle]);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.themeTitle !== prevState.themeTitle) {
-      localStorage.setItem("theme", this.state.themeTitle);
-    }
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem(
-        "local-contacts",
-        JSON.stringify(this.state.contacts)
-      );
-    }
-  }
+  useEffect(() => {
+    localStorage.setItem("local-contacts", JSON.stringify(contacts));
+  }, [contacts]);
 
-  handleThemeSwitch = () => {
-    this.setState(({ themeTitle }) => ({
-      themeTitle: themeTitle === "light" ? "dark" : "light",
-    }));
-  };
+  const handleThemeSwitch = () =>
+    setThemeTitle((prev) => (prev === "light" ? "dark" : "light"));
 
-  addContact = (contact) => {
-    const normalizeName = this.textNormalize(contact.name);
-    if (
-      this.state.contacts.some(
-        (item) => item.name.toLowerCase() === normalizeName
-      )
-    ) {
+  const addContact = (contact) => {
+    const normalizeName = textNormalize(contact.name);
+    const isInContacts = contacts.some(
+      (item) => item.name.toLowerCase() === normalizeName
+    );
+
+    if (isInContacts) {
       toast(`${contact.name} is already in your contacts`);
       return;
     }
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts],
-      filter: "",
-    }));
+    setContacts((prev) => [contact, ...prev]);
+    setFilter("");
   };
 
-  removeContact = (id) => {
-    this.setState(({ contacts }) => ({
-      contacts: contacts.filter((contact) => contact.id !== id),
-    }));
-  };
-
-  onFilterChange = (e) => {
-    this.setState({ filter: e.target.value });
-  };
-
-  textNormalize = (text) => {
-    return text.toLowerCase();
-  };
-
-  getFilteredContacts = (contacts, filter) => {
-    const normalizedFilter = this.textNormalize(filter);
+  const getFilteredContacts = () => {
+    const normalizedFilter = textNormalize(filter);
     return contacts.filter(({ name }) =>
       name.toLowerCase().includes(normalizedFilter)
     );
   };
 
-  render() {
-    const { themeTitle, contacts, filter } = this.state;
-    const filteredContacts = this.getFilteredContacts(contacts, filter);
-    return (
-      <>
-        <ThemeProvider theme={themes[themeTitle]}>
-          <GlobalStyle />
-          <Header>
-            <HeaderContainer>
-              <Logo />
-              <ThemeSwitcher
-                onBtnClick={this.handleThemeSwitch}
-                currentTheme={themeTitle}
-              />
-            </HeaderContainer>
-          </Header>
-          <main>
-            <section>
-              <Container>
-                <Section
-                  title="Simple phonebook"
-                  hLevel="h1"
-                  visuallyHidden={false}
-                >
-                  <ContactsForm addContact={this.addContact} />
-                </Section>
-                <Section title="Your Contacts" hLevel="h2">
-                  {contacts.length ? (
-                    <>
-                      <Filter
-                        filterText={filter}
-                        onChange={this.onFilterChange}
-                      />
-                      <ContactsList
-                        contacts={filteredContacts}
-                        removeContact={this.removeContact}
-                      />
-                    </>
-                  ) : (
-                    <EmptyContactsNotify />
-                  )}
-                </Section>
-              </Container>
-            </section>
-          </main>
-          <div>
-            <Toaster
-              toastOptions={{
-                style: {
-                  borderRadius: "10px",
-                  background: "#236d44",
-                  color: "#fff",
-                },
-              }}
+  const removeContact = (id) => {
+    setContacts((prev) => prev.filter((contact) => contact.id !== id));
+  };
+
+  const textNormalize = (text) => {
+    return text.toLowerCase();
+  };
+
+  return (
+    <>
+      <ThemeProvider theme={themes[themeTitle]}>
+        <GlobalStyle />
+        <Header>
+          <HeaderContainer>
+            <Logo />
+            <ThemeSwitcher
+              onBtnClick={handleThemeSwitch}
+              currentTheme={themeTitle}
             />
-          </div>
-        </ThemeProvider>
-      </>
-    );
-  }
-}
+          </HeaderContainer>
+        </Header>
+        <main>
+          <section>
+            <Container>
+              <Section
+                title="Simple phonebook"
+                hLevel="h1"
+                visuallyHidden={false}
+              >
+                <ContactsForm addContact={addContact} />
+              </Section>
+              <Section title="Your Contacts" hLevel="h2">
+                {contacts.length ? (
+                  <>
+                    <Filter
+                      filterText={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                    />
+                    <ContactsList
+                      contacts={getFilteredContacts()}
+                      removeContact={removeContact}
+                    />
+                  </>
+                ) : (
+                  <EmptyContactsNotify />
+                )}
+              </Section>
+            </Container>
+          </section>
+        </main>
+        <div>
+          <Toaster
+            toastOptions={{
+              style: {
+                borderRadius: "10px",
+                background: "#236d44",
+                color: "#fff",
+              },
+            }}
+          />
+        </div>
+      </ThemeProvider>
+    </>
+  );
+};
+
+export default App;

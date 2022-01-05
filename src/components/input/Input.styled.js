@@ -21,6 +21,7 @@ export const InputField = styled.input`
   background-color: ${({ theme }) => theme.colors.inputColor};
   outline: none;
   cursor: pointer;
+  transition: background-color 250ms linear;
 
   &::placeholder {
     font-size: 16px;

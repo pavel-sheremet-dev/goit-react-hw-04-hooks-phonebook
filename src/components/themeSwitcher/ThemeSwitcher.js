@@ -1,18 +1,25 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import { useState } from "react";
 
 import sprite from "../../images/sprite.svg";
 import { ThemeBtn, ThemeIcon } from "./ThemeSwitcher.styled";
 
-export default class ThemeSwitcher extends Component {
-  state = {
-    opacity: 1,
-    scale: 1,
+const ThemeSwitcher = ({ currentTheme, onBtnClick }) => {
+  const [opacity, setOpacity] = useState(1);
+  const [scale, setScale] = useState(1);
+
+  const handleClick = () => {
+    hideElement().then(() => {
+      onBtnClick();
+      setOpacity(1);
+      setScale(1);
+    });
   };
 
-  hideElement = () => {
+  const hideElement = () => {
     const promise = new Promise((res) => {
-      this.setState({ opacity: 0, scale: 0.7 });
+      setOpacity(0);
+      setScale(0.7);
       setTimeout(() => {
         res(true);
       }, 125);
@@ -20,47 +27,62 @@ export default class ThemeSwitcher extends Component {
     return promise;
   };
 
-  handleClick = () => {
-    this.hideElement().then(() => {
-      this.props.onBtnClick();
-      this.setState({ opacity: 1, scale: 1 });
-    });
-  };
+  return (
+    <ThemeBtn type="button" onClick={handleClick}>
+      <ThemeIcon opacity={opacity} scale={scale}>
+        <use
+          href={`${sprite}#${
+            currentTheme === "light" ? "icon-sun" : "icon-moon"
+          }`}
+        ></use>
+      </ThemeIcon>
+    </ThemeBtn>
+  );
+};
 
-  render() {
-    const { opacity, scale } = this.state;
-    const { currentTheme } = this.props;
-    return (
-      <ThemeBtn type="button" onClick={this.handleClick}>
-        <ThemeIcon opacity={opacity} scale={scale}>
-          <use
-            href={`${sprite}#${
-              currentTheme === "light" ? "icon-sun" : "icon-moon"
-            }`}
-          ></use>
-        </ThemeIcon>
-      </ThemeBtn>
-    );
-  }
-}
+export default ThemeSwitcher;
 
-// const ThemeSwitcher = ({ onBtnClick, currentTheme }) => {
-//   return (
-//     <ThemeBtn type="button" onClick={onBtnClick}>
-//       <ThemeIcon>
-//         <use
-//           href={`${sprite}#${
-//             currentTheme === "light" ? "icon-sun" : "icon-moon"
-//           }`}
-//         ></use>
-//       </ThemeIcon>
-//     </ThemeBtn>
-//   );
-// };
+// export default class ThemeSwitcher extends Component {
+//   state = {
+//     opacity: 1,
+//     scale: 1,
+//   };
+
+//   hideElement = () => {
+//     const promise = new Promise((res) => {
+//       this.setState({ opacity: 0, scale: 0.7 });
+//       setTimeout(() => {
+//         res(true);
+//       }, 125);
+//     });
+//     return promise;
+//   };
+
+//   handleClick = () => {
+//     this.hideElement().then(() => {
+//       this.props.onBtnClick();
+//       this.setState({ opacity: 1, scale: 1 });
+//     });
+//   };
+
+//   render() {
+//     const { opacity, scale } = this.state;
+//     const { currentTheme } = this.props;
+//     return (
+//       <ThemeBtn type="button" onClick={this.handleClick}>
+//         <ThemeIcon opacity={opacity} scale={scale}>
+//           <use
+//             href={`${sprite}#${
+//               currentTheme === "light" ? "icon-sun" : "icon-moon"
+//             }`}
+//           ></use>
+//         </ThemeIcon>
+//       </ThemeBtn>
+//     );
+//   }
+// }
 
 ThemeSwitcher.propTypes = {
   currentTheme: PropTypes.string.isRequired,
   onBtnClick: PropTypes.func.isRequired,
 };
-
-// export default ThemeSwitcher;
