@@ -15,5 +15,4 @@ const Filter = ({ filterText, onChange }) => {
     </Label>
   );
 };
-
 export default Filter;

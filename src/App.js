@@ -1,5 +1,5 @@
 import { GlobalStyle } from "./styles/GlobalStyles";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ThemeProvider } from "styled-components";
 import themes from "./styles/themes/index";
 import ThemeSwitcher from "./components/themeSwitcher/ThemeSwitcher";
@@ -48,19 +48,19 @@ const App = () => {
     setFilter("");
   };
 
-  const getFilteredContacts = () => {
+  const textNormalize = (text) => {
+    return text.toLowerCase();
+  };
+
+  const filteredContacts = useMemo(() => {
     const normalizedFilter = textNormalize(filter);
     return contacts.filter(({ name }) =>
       name.toLowerCase().includes(normalizedFilter)
     );
-  };
+  }, [contacts, filter]);
 
   const removeContact = (id) => {
     setContacts((prev) => prev.filter((contact) => contact.id !== id));
-  };
-
-  const textNormalize = (text) => {
-    return text.toLowerCase();
   };
 
   return (
@@ -94,7 +94,7 @@ const App = () => {
                       onChange={(e) => setFilter(e.target.value)}
                     />
                     <ContactsList
-                      contacts={getFilteredContacts()}
+                      contacts={filteredContacts}
                       removeContact={removeContact}
                     />
                   </>
