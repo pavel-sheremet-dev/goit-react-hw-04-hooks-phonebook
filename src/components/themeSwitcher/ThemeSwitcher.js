@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect, memo } from "react";
 
 import sprite from "../../images/sprite.svg";
 import { ThemeBtn, ThemeIcon } from "./ThemeSwitcher.styled";
@@ -7,6 +7,16 @@ import { ThemeBtn, ThemeIcon } from "./ThemeSwitcher.styled";
 const ThemeSwitcher = ({ currentTheme, onBtnClick }) => {
   const [opacity, setOpacity] = useState(1);
   const [scale, setScale] = useState(1);
+
+  console.log("render");
+
+  useEffect(() => {
+    console.log("currentTheme");
+  }, [currentTheme]);
+
+  useEffect(() => {
+    console.log("onBtnClick");
+  }, [onBtnClick]);
 
   const handleClick = () => {
     hideElement().then(() => {
@@ -40,7 +50,7 @@ const ThemeSwitcher = ({ currentTheme, onBtnClick }) => {
   );
 };
 
-export default ThemeSwitcher;
+export default memo(ThemeSwitcher);
 
 // export default class ThemeSwitcher extends Component {
 //   state = {

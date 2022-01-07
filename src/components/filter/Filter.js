@@ -1,4 +1,5 @@
 import { InputName, Label, InputField } from "../input/Input.styled";
+import React, { memo } from "react";
 
 const Filter = ({ filterText, onChange }) => {
   return (
@@ -15,4 +16,4 @@ const Filter = ({ filterText, onChange }) => {
     </Label>
   );
 };
-export default Filter;
+export default memo(Filter);

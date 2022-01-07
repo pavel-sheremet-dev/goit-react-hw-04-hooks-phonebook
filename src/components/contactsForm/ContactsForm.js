@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 
 import PropTypes from "prop-types";
 import shortid from "shortid";
@@ -76,7 +76,7 @@ const ContactsForm = ({ addContact }) => {
   );
 };
 
-export default ContactsForm;
+export default memo(ContactsForm);
 
 ContactsForm.propTypes = {
   addContact: PropTypes.func.isRequired,
