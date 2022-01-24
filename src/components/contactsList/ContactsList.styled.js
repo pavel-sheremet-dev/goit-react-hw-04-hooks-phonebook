@@ -2,10 +2,6 @@ import styled from "styled-components";
 
 export const Contacts = styled.ul`
   @media screen and (min-width: 480px) {
-    width: calc(100% + 10px);
-    height: calc(100vh - 120px);
-    overflow-y: auto;
-    overflow-x: hidden;
     &::-webkit-scrollbar {
       width: 5px;
       background-color: ${({ theme }) => theme.colors.scrollBackground};

@@ -1,33 +1,17 @@
 import styled from "styled-components";
 
-export const SectionStyled = styled.div`
+export const StyledSection = styled.section`
   padding-top: 10px;
   padding-bottom: 20px;
-
-  /* @media screen and (min-width: 768px) {
-    &:not(:last-child) {
-      margin-right: 50px;
-    }
-  }
-  @media screen and (min-width: 1024px) {
-    &:not(:last-child) {
-      margin-right: 200px;
-    }
-  } */
+  margin: 0 auto;
 `;
 
-export const SectionTitle = styled.h1`
+export const Title = styled.h1`
+  font-size: 30px;
   margin-bottom: 20px;
-  font-size: ${({ hLevel }) => {
-    if (hLevel === "h1") {
-      return "25px";
-    }
-    if (hLevel === "h2") {
-      return "25px";
-    }
-  }};
-  ${({ visuallyHidden }) =>
-    visuallyHidden &&
+
+  ${({ isHidden }) =>
+    isHidden &&
     `
     position: absolute;
     width: 1px;
@@ -39,5 +23,5 @@ export const SectionTitle = styled.h1`
     clip-path: inset(100%);
     clip: rect(0 0 0 0);
     overflow: hidden;
-  `}
+  `};
 `;

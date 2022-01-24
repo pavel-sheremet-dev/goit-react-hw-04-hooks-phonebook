@@ -1,60 +1,24 @@
 import { GlobalStyle } from "./styles/GlobalStyles";
-import { useState, useEffect, useCallback } from "react";
 import { ThemeProvider } from "styled-components";
+import { useSelector } from "react-redux";
+
 import themes from "./styles/themes/index";
-import ThemeSwitcher from "./components/themeSwitcher/ThemeSwitcher";
 
 import Header from "./components/header/Header";
-import { HeaderContainer } from "./components/container/StyledContainer";
 
-import Logo from "./components/logo/Logo";
-
-import { Toaster } from "react-hot-toast";
-import Contacts from "./components/contacts/Contacts";
+import Main from "./components/main/Main";
+import Notify from "./components/notify/Notify";
 
 const App = () => {
-  const [themeTitle, setThemeTitle] = useState(
-    () => localStorage.getItem("theme") ?? "dark"
-  );
-
-  useEffect(() => {
-    localStorage.setItem("theme", themeTitle);
-  }, [themeTitle]);
-
-  const handleThemeSwitch = useCallback(
-    () => setThemeTitle((prev) => (prev === "light" ? "dark" : "light")),
-    []
-  );
+  const theme = useSelector((state) => state.theme);
 
   return (
     <>
-      <ThemeProvider theme={themes[themeTitle]}>
+      <ThemeProvider theme={themes[theme]}>
         <GlobalStyle />
-        <Header>
-          <HeaderContainer>
-            <Logo />
-            <ThemeSwitcher
-              onBtnClick={handleThemeSwitch}
-              currentTheme={themeTitle}
-            />
-          </HeaderContainer>
-        </Header>
-        <main>
-          <section>
-            <Contacts />
-          </section>
-        </main>
-        <div>
-          <Toaster
-            toastOptions={{
-              style: {
-                borderRadius: "10px",
-                background: "#236d44",
-                color: "#fff",
-              },
-            }}
-          />
-        </div>
+        <Header />
+        <Main />
+        <Notify />
       </ThemeProvider>
     </>
   );

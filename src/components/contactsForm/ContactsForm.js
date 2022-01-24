@@ -1,6 +1,6 @@
 import React, { useState, memo } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+// import PropTypes from "prop-types";
 import shortid from "shortid";
 import { Form } from "./ContactsForm.styled";
 import { ButtonStyled } from "../Button/Buttonstyled";
@@ -8,9 +8,12 @@ import { InputName, Label, InputField } from "../input/Input.styled";
 import { addItem } from "../../redux/contacts/contacts-actions";
 import toast from "react-hot-toast";
 
-const ContactsForm = ({ onAddContact, contacts }) => {
+const ContactsForm = () => {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
+
+  const contacts = useSelector((state) => state.contacts.items);
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const inputName = e.target.name;
@@ -39,7 +42,7 @@ const ContactsForm = ({ onAddContact, contacts }) => {
 
     const newContact = generateContact(name, number);
 
-    onAddContact(newContact);
+    dispatch(addItem(newContact));
 
     setName("");
     setNumber("");
@@ -88,16 +91,8 @@ const ContactsForm = ({ onAddContact, contacts }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  contacts: state.contacts.items,
-});
+export default memo(ContactsForm);
 
-const mapDispatchToProps = (dispatch) => ({
-  onAddContact: (contact) => dispatch(addItem(contact)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(memo(ContactsForm));
-
-ContactsForm.propTypes = {
-  onAddContact: PropTypes.func.isRequired,
-};
+// ContactsForm.propTypes = {
+//   onAddContact: PropTypes.func.isRequired,
+// };
