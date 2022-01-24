@@ -1,17 +1,16 @@
 import React, { useState, memo } from "react";
-
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import shortid from "shortid";
 import { Form } from "./ContactsForm.styled";
 import { ButtonStyled } from "../Button/Buttonstyled";
 import { InputName, Label, InputField } from "../input/Input.styled";
+import { addItem } from "../../redux/contacts/contacts-actions";
+import toast from "react-hot-toast";
 
-const ContactsForm = ({ addContact }) => {
+const ContactsForm = ({ onAddContact, contacts }) => {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
-
-  // const stateSetsObject = { setName, setNumber };
-  // const stateSetsKeys = Object.keys(stateSetsObject);
 
   const handleChange = (e) => {
     const inputName = e.target.name;
@@ -22,19 +21,32 @@ const ContactsForm = ({ addContact }) => {
     if (inputName === "number") {
       setNumber(value);
     }
-
-    // const stateValue = stateSetsKeys.filter(key =>
-    //   key.toLowerCase().includes(inputName),
-    // )[0];
-    // stateSetsObject[stateValue](value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const normalizeName = textNormalize(name);
+
+    const isInContacts = contacts.some(
+      (item) => item.name.toLowerCase() === normalizeName
+    );
+
+    if (isInContacts) {
+      toast(`${name} is already in your contacts`);
+      return;
+    }
+
     const newContact = generateContact(name, number);
-    addContact(newContact);
+
+    onAddContact(newContact);
+
     setName("");
     setNumber("");
+  };
+
+  const textNormalize = (text) => {
+    return text.toLowerCase();
   };
 
   const generateContact = (name, number) => {
@@ -76,8 +88,16 @@ const ContactsForm = ({ addContact }) => {
   );
 };
 
-export default memo(ContactsForm);
+const mapStateToProps = (state) => ({
+  contacts: state.contacts.items,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onAddContact: (contact) => dispatch(addItem(contact)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(memo(ContactsForm));
 
 ContactsForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
+  onAddContact: PropTypes.func.isRequired,
 };

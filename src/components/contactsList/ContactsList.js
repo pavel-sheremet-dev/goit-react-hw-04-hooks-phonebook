@@ -1,4 +1,6 @@
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { removeItem } from "../../redux/contacts/contacts-actions";
 import { ButtonStyled } from "../Button/Buttonstyled";
 import {
   ContactInfo,
@@ -8,11 +10,23 @@ import {
   Contacts,
   PhoneLink,
 } from "./ContactsList.styled";
+import { useMemo } from "react";
 
-const ContactsList = ({ contacts, removeContact }) => {
+const ContactsList = ({ contacts, filter, onRemoveContact }) => {
+  const textNormalize = (text) => {
+    return text.toLowerCase();
+  };
+
+  const filteredContacts = useMemo(() => {
+    const normalizedFilter = textNormalize(filter);
+    return contacts.filter(({ name }) =>
+      name.toLowerCase().includes(normalizedFilter)
+    );
+  }, [contacts, filter]);
+
   return (
     <Contacts>
-      {contacts.map(({ id, name, number }) => (
+      {filteredContacts.map(({ id, name, number }) => (
         <ContactsItem key={id}>
           <ContactInfo>
             <ContactName>{name}</ContactName>
@@ -20,16 +34,14 @@ const ContactsList = ({ contacts, removeContact }) => {
               <PhoneLink href={`tel:${name}`}>{number}</PhoneLink>
             </ContactPhone>
           </ContactInfo>
-          {removeContact && (
-            <ButtonStyled
-              type="button"
-              onClick={() => {
-                removeContact(id);
-              }}
-            >
-              Remove
-            </ButtonStyled>
-          )}
+          <ButtonStyled
+            type="button"
+            onClick={() => {
+              onRemoveContact(id);
+            }}
+          >
+            Remove
+          </ButtonStyled>
         </ContactsItem>
       ))}
     </Contacts>
@@ -44,7 +56,17 @@ ContactsList.propTypes = {
       number: PropTypes.string.isRequired,
     })
   ),
-  removeContact: PropTypes.func,
+  onRemoveContact: PropTypes.func,
+  filter: PropTypes.string.isRequired,
 };
 
-export default ContactsList;
+const mapStateToProps = (state) => ({
+  contacts: state.contacts.items,
+  filter: state.contacts.filter,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onRemoveContact: (id) => dispatch(removeItem(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactsList);
